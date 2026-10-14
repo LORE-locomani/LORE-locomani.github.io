@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="LORE: Learning Contact-Rich Humanoid Loco-Manipulation without Paired Interaction Demonstrations." />
+  <meta name="theme-color" content="#f7f6f2" />
+  <title>LORE | Contact-Rich Humanoid Loco-Manipulation</title>
+  <link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="assets/css/index.css?v=22" />
+  <script defer src="assets/js/index.js?v=23"></script>
+</head>
+<body>
+  <div class="reading-progress" aria-hidden="true"><span></span></div>
+
+  <header class="site-header" id="top">
+    <nav class="nav shell" aria-label="Primary navigation">
+      <a class="brand" href="#top">LORE</a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-links"><span></span><span></span><span></span><b class="sr-only">Toggle navigation</b></button>
+      <div class="nav-links" id="nav-links">
+        <a href="#video">Video</a>
+        <a href="#abstract">Abstract</a>
+        <a href="#comparisons">Comparisons</a>
+        <a href="#contact-analysis">Contact Analysis</a>
+        <a href="#ablation">Ablation</a>
+        <a href="#real-world">Real World</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero shell">
+      <div class="hero-copy">
+        <h1>LORE</h1>
+        <h2>Learning Contact-Rich Humanoid Loco-Manipulation without Paired Interaction Demonstrations</h2>
+        <div class="authors" aria-label="Paper authors">
+          <span>Daoling Qin<sup>1,2</sup></span>
+          <span>Rui Song<sup>1</sup></span>
+          <span>Huilin Zhang<sup>2</sup></span>
+          <span>Jiayi Wang<sup>2</sup></span>
+          <span>Guoteng Zhang<sup>1,*</sup></span>
+          <span>Jingwen Zhang<sup>2,*</sup></span>
+        </div>
+        <div class="affiliations">
+          <p><sup>1</sup> Shandong Provincial Key Laboratory of Humanoid Robots and the School of Control Science and Engineering, Shandong University, Jinan 250061, China</p>
+          <p><sup>2</sup> State Key Laboratory of General Artificial Intelligence, Beijing Institute for General Artificial Intelligence (BIGAI), Beijing 100080, China</p>
+          <p><sup>*</sup> Corresponding authors</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-first shell video-abstract-section" id="video">
+      <div class="video-abstract-grid">
+        <div class="video-abstract-panel">
+          <h2 class="section-title">Video</h2>
+          <!-- Fill the YouTube ID only, not the full URL. -->
+          <div class="main-video" id="main-video-card" data-youtube-id="">
+            <div class="main-video-player" id="main-video-player">
+              <div class="video-empty"><span>▶</span><strong>Main paper video</strong></div>
+            </div>
+          </div>
+        </div>
+        <div class="video-abstract-panel" id="abstract">
+          <h2 class="section-title">Abstract</h2>
+          <div class="abstract">
+            <p>Contact-rich humanoid loco-manipulation requires adapting whole-body coordination and contact forces to object conditions. Existing methods relying on paired humanoid–object interaction (HOI) demonstrations are limited by the difficulty of collecting diverse interaction data at scale and may inherit restrictions from the demonstrated contact patterns. To address these limitations, we propose LORE, a framework for learning such loco-manipulation skills without paired robot–object trajectories or reference-derived contact sequences. LORE jointly learns motion skills and a compact latent representation through variational reinforcement learning, with an arm-load curriculum that prepares the abilities for sustained interaction loads. Downstream task policies adapt these skills through the pretrained prior–decoder interface, using object-centric kinematic and contact-force rewards to learn contact-rich loco-manipulation behaviors. Extensive simulation and hardware experiments demonstrate contact-rich humanoid loco-manipulation across diverse object properties and spatial conditions, while showing adaptation of whole-body contact patterns to these variations.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section compact-section shell" id="overview">
+      <h2 class="section-title">Overview</h2>
+      <figure class="overview-figure">
+        <img src="assets/images/framework-overview.png" alt="Overview of the LORE framework" />
+        <button type="button" class="zoom-button">View full size</button>
+      </figure>
+    </section>
+
+    <section class="section results-section" id="comparisons">
+      <div class="results-shell">
+        <h2 class="section-title results-title">Comparisons</h2>
+
+        <div class="matrix-block">
+          <h3>Single-Factor Interaction Variations</h3>
+          <div class="matrix-scroll">
+            <div class="result-matrix result-matrix-3">
+              <div class="matrix-header">
+                <div></div>
+                <div class="matrix-columns"><div class="column-label">Ours</div><div class="column-label">HDMI</div><div class="column-label">ResMimic</div></div>
+              </div>
+              <div class="result-row matrix-data-row">
+                <div class="result-row-head"><h4>Carry</h4></div>
+                <div class="row-videos">
+                  <div class="media-tile" data-video-path="comparisons/reference/carry_ours.mp4?v=11"><img src="assets/images/comparison_posters/reference_carry_ours.jpg?v=11" alt="LORE carry comparison" /><button type="button" aria-label="Play LORE carry comparison">▶</button></div>
+                  <div class="media-tile" data-video-path="comparisons/reference/carry_hdmi.mp4?v=11"><img src="assets/images/comparison_posters/reference_carry_hdmi.jpg?v=11" alt="HDMI carry comparison" /><button type="button" aria-label="Play HDMI carry comparison">▶</button></div>
+                  <div class="media-tile" data-video-path="comparisons/reference/carry_resmimic.mp4?v=11"><img src="assets/images/comparison_posters/reference_carry_resmimic.jpg?v=11" alt="ResMimic carry comparison" /><button type="button" aria-label="Play ResMimic carry comparison">▶</button></div>
+                </div>
+              </div>
+              <div class="result-row matrix-data-row">
+                <div class="result-row-head"><h4>Push</h4></div>
+                <div class="row-videos">
+                  <div class="media-tile" data-video-path="comparisons/reference/push_ours.mp4?v=11"><img src="assets/images/comparison_posters/reference_push_ours.jpg?v=11" alt="LORE push comparison" /><button type="button" aria-label="Play LORE push comparison">▶</button></div>
+                  <div class="media-tile" data-video-path="comparisons/reference/push_hdmi.mp4?v=11"><img src="assets/images/comparison_posters/reference_push_hdmi.jpg?v=11" alt="HDMI push comparison" /><button type="button" aria-label="Play HDMI push comparison">▶</button></div>
+                  <div class="media-tile media-empty" aria-label="ResMimic does not provide a push-box result"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="matrix-block">
+          <h3>Joint Interaction Variations</h3>
+          <div class="matrix-scroll">
+            <div class="result-matrix result-matrix-3">
+              <div class="matrix-header">
+                <div></div>
+                <div class="matrix-columns"><div class="column-label">Ours</div><div class="column-label">PhysHSI</div><div class="column-label">SONIC</div></div>
+              </div>
+              <div class="result-row matrix-data-row">
+                <div class="result-row-head"><h4>Carry</h4></div>
+                <div class="row-videos">
+                  <div class="media-tile" data-video-path="comparisons/general/carry_ours.mp4?v=11"><img src="assets/images/comparison_posters/general_carry_ours.jpg?v=11" alt="LORE carry comparison" /><button type="button" aria-label="Play LORE carry comparison">▶</button></div>
+                  <div class="media-tile" data-video-path="comparisons/general/carry_physhsi.mp4?v=11"><img src="assets/images/comparison_posters/general_carry_physhsi.jpg?v=11" alt="PhysHSI carry comparison" /><button type="button" aria-label="Play PhysHSI carry comparison">▶</button></div>
+                  <div class="media-tile" data-video-path="comparisons/general/carry_sonic.mp4?v=11"><img src="assets/images/comparison_posters/general_carry_sonic.jpg?v=11" alt="SONIC carry comparison" /><button type="button" aria-label="Play SONIC carry comparison">▶</button></div>
+                </div>
+              </div>
+              <div class="result-row matrix-data-row">
+                <div class="result-row-head"><h4>Push</h4></div>
+                <div class="row-videos">
+                  <div class="media-tile" data-video-path="comparisons/general/push_ours.mp4?v=11"><img src="assets/images/comparison_posters/general_push_ours.jpg?v=11" alt="LORE push comparison" /><button type="button" aria-label="Play LORE push comparison">▶</button></div>
+                  <div class="media-tile" data-video-path="comparisons/general/push_physhsi.mp4?v=11"><img src="assets/images/comparison_posters/general_push_physhsi.jpg?v=11" alt="PhysHSI push comparison" /><button type="button" aria-label="Play PhysHSI push comparison">▶</button></div>
+                  <div class="media-tile" data-video-path="comparisons/general/push_sonic.mp4?v=11"><img src="assets/images/comparison_posters/general_push_sonic.jpg?v=11" alt="SONIC push comparison" /><button type="button" aria-label="Play SONIC push comparison">▶</button></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section results-section" id="contact-analysis">
+      <div class="results-shell">
+        <h2 class="section-title results-title">Contact-Rich Behavior Analysis</h2>
+        <div class="result-row contact-result-row">
+          <div class="result-row-spacer" aria-hidden="true"></div>
+          <div class="carousel-frame contact-carousel">
+            <button class="carousel-arrow carousel-arrow-previous" type="button" data-scroll="contact-analysis-track" data-direction="-1" aria-label="Show previous contact-rich conditions"></button>
+            <div class="media-track contact-pair-track" id="contact-analysis-track">
+              <div class="contact-pair">
+                <div class="media-tile strip-tile" data-video-path="contact_analysis/carry_size/lower.mp4"><img src="assets/images/carry-size.png" alt="Carry with object scale 0.80" /><button type="button" aria-label="Play carry at object scale 0.80">▶</button><span>Carry Size · <i>s</i> = 0.80</span></div>
+                <div class="media-tile strip-tile" data-video-path="contact_analysis/carry_size/upper.mp4"><img src="assets/images/carry-size.png" alt="Carry with object scale 1.20" /><button type="button" aria-label="Play carry at object scale 1.20">▶</button><span>Carry Size · <i>s</i> = 1.20</span></div>
+              </div>
+              <div class="contact-pair">
+                <div class="media-tile strip-tile" data-video-path="contact_analysis/carry_height/lower.mp4"><img src="assets/images/carry-height.png" alt="Carry at object height 0.20 meters" /><button type="button" aria-label="Play carry at object height 0.20 meters">▶</button><span>Carry Height · <i>h</i><sub>obj</sub> = 0.20 m</span></div>
+                <div class="media-tile strip-tile" data-video-path="contact_analysis/carry_height/upper.mp4"><img src="assets/images/carry-height.png" alt="Carry at object height 0.80 meters" /><button type="button" aria-label="Play carry at object height 0.80 meters">▶</button><span>Carry Height · <i>h</i><sub>obj</sub> = 0.80 m</span></div>
+              </div>
+              <div class="contact-pair">
+                <div class="media-tile strip-tile" data-video-path="contact_analysis/push_size/lower.mp4"><img src="assets/images/push-size.png" alt="Push with object scale 0.80" /><button type="button" aria-label="Play push at object scale 0.80">▶</button><span>Push Size · <i>s</i> = 0.80</span></div>
+                <div class="media-tile strip-tile" data-video-path="contact_analysis/push_size/upper.mp4"><img src="assets/images/push-size.png" alt="Push with object scale 1.20" /><button type="button" aria-label="Play push at object scale 1.20">▶</button><span>Push Size · <i>s</i> = 1.20</span></div>
+              </div>
+              <div class="contact-pair">
+                <div class="media-tile strip-tile" data-video-path="contact_analysis/push_friction/lower.mp4"><img src="assets/images/push-mass.png" alt="Push with friction coefficient 0.15" /><button type="button" aria-label="Play push at friction coefficient 0.15">▶</button><span>Push Friction · <i>μ</i> = 0.15</span></div>
+                <div class="media-tile strip-tile" data-video-path="contact_analysis/push_friction/upper.mp4"><img src="assets/images/push-mass.png" alt="Push with friction coefficient 0.90" /><button type="button" aria-label="Play push at friction coefficient 0.90">▶</button><span>Push Friction · <i>μ</i> = 0.90</span></div>
+              </div>
+            </div>
+            <button class="carousel-arrow carousel-arrow-next" type="button" data-scroll="contact-analysis-track" data-direction="1" aria-label="Show next contact-rich conditions"></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section results-section" id="ablation">
+      <div class="results-shell">
+        <h2 class="section-title results-title">Ablation Study</h2>
+        <div class="result-row">
+          <div class="result-row-head"><h4>Object Carrying</h4></div>
+          <div class="carousel-frame">
+            <button class="carousel-arrow carousel-arrow-previous" type="button" data-scroll="ablation-carry-track" data-direction="-1" aria-label="Show previous carrying ablations"></button>
+            <div class="media-track" id="ablation-carry-track">
+              <div class="media-tile strip-tile" data-video-path="ablation/carry/ours.mp4"><img src="assets/images/hero-experiment.png" alt="Full Model carrying ablation" /><button type="button" aria-label="Play Full Model carrying ablation">▶</button><span>Full Model (Ours)</span></div>
+              <div class="media-tile strip-tile" data-video-path="ablation/carry/from_scratch.mp4"><img src="assets/images/carry-size.png" alt="From-Scratch Policy carrying ablation" /><button type="button" aria-label="Play From-Scratch Policy carrying ablation">▶</button><span>From-Scratch Policy</span></div>
+              <div class="media-tile strip-tile" data-video-path="ablation/carry/without_arm_load.mp4"><img src="assets/images/carry-height.png" alt="Carrying without arm-load curriculum" /><button type="button" aria-label="Play carrying without arm-load curriculum">▶</button><span>w/o Arm-Load Curriculum</span></div>
+              <div class="media-tile strip-tile" data-video-path="ablation/carry/without_contact_force.mp4"><img src="assets/images/g1-largebox.png" alt="Carrying without contact-force rewards" /><button type="button" aria-label="Play carrying without contact-force rewards">▶</button><span>w/o Contact-Force Rewards</span></div>
+              <div class="media-tile strip-tile" data-video-path="ablation/carry/action_space_residual.mp4"><img src="assets/images/g1-suitcase.png" alt="Action-Space Residual Adapter carrying ablation" /><button type="button" aria-label="Play Action-Space Residual Adapter carrying ablation">▶</button><span>Action-Space Residual Adapter</span></div>
+            </div>
+            <button class="carousel-arrow carousel-arrow-next" type="button" data-scroll="ablation-carry-track" data-direction="1" aria-label="Show next carrying ablations"></button>
+          </div>
+        </div>
+
+        <div class="result-row">
+          <div class="result-row-head"><h4>Object Pushing</h4></div>
+          <div class="carousel-frame">
+            <button class="carousel-arrow carousel-arrow-previous" type="button" data-scroll="ablation-push-track" data-direction="-1" aria-label="Show previous pushing ablations"></button>
+            <div class="media-track" id="ablation-push-track">
+              <div class="media-tile strip-tile" data-video-path="ablation/push/ours.mp4"><img src="assets/images/push-size.png" alt="Full Model pushing ablation" /><button type="button" aria-label="Play Full Model pushing ablation">▶</button><span>Full Model (Ours)</span></div>
+              <div class="media-tile strip-tile" data-video-path="ablation/push/from_scratch.mp4"><img src="assets/images/push-mass.png" alt="From-Scratch Policy pushing ablation" /><button type="button" aria-label="Play From-Scratch Policy pushing ablation">▶</button><span>From-Scratch Policy</span></div>
+              <div class="media-tile strip-tile" data-video-path="ablation/push/without_arm_load.mp4"><img src="assets/images/push-size.png" alt="Pushing without arm-load curriculum" /><button type="button" aria-label="Play pushing without arm-load curriculum">▶</button><span>w/o Arm-Load Curriculum</span></div>
+              <div class="media-tile strip-tile" data-video-path="ablation/push/without_contact_force.mp4"><img src="assets/images/push-mass.png" alt="Pushing without contact-force rewards" /><button type="button" aria-label="Play pushing without contact-force rewards">▶</button><span>w/o Contact-Force Rewards</span></div>
+              <div class="media-tile strip-tile" data-video-path="ablation/push/action_space_residual.mp4"><img src="assets/images/push-size.png" alt="Action-Space Residual Adapter pushing ablation" /><button type="button" aria-label="Play Action-Space Residual Adapter pushing ablation">▶</button><span>Action-Space Residual Adapter</span></div>
+            </div>
+            <button class="carousel-arrow carousel-arrow-next" type="button" data-scroll="ablation-push-track" data-direction="1" aria-label="Show next pushing ablations"></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section results-section" id="real-world">
+      <div class="results-shell">
+        <h2 class="section-title results-title">Real-World Experiments</h2>
+        <h3 class="task-title">Carry</h3>
+
+        <div class="result-row">
+          <div class="result-row-head"><h4>Height</h4></div>
+          <div class="media-track" id="height-track">
+            <div class="media-tile strip-tile" data-video-path="real_world/carry/height/low.mp4"><img src="assets/images/carry-height.png" alt="Carry at low height" /><button type="button">▶</button><span>Low</span></div>
+            <div class="media-tile strip-tile" data-video-path="real_world/carry/height/mid.mp4"><img src="assets/images/hero-experiment.png" alt="Carry at middle height" /><button type="button">▶</button><span>Mid</span></div>
+            <div class="media-tile strip-tile" data-video-path="real_world/carry/height/high.mp4"><img src="assets/images/g1-largebox.png" alt="Carry at high height" /><button type="button">▶</button><span>High</span></div>
+          </div>
+        </div>
+
+        <div class="result-row">
+          <div class="result-row-head"><h4>Size</h4></div>
+          <div class="media-track" id="carry-size-track">
+            <div class="media-tile strip-tile" data-video-path="real_world/carry/size/small.mp4"><img src="assets/images/carry-size.png" alt="Carry a small object" /><button type="button">▶</button><span>Small</span></div>
+            <div class="media-tile strip-tile" data-video-path="real_world/carry/size/mid.mp4"><img src="assets/images/hero-experiment.png" alt="Carry a medium object" /><button type="button">▶</button><span>Mid</span></div>
+            <div class="media-tile strip-tile" data-video-path="real_world/carry/size/big.mp4"><img src="assets/images/g1-largebox.png" alt="Carry a large object" /><button type="button">▶</button><span>Big</span></div>
+          </div>
+        </div>
+
+        <div class="result-row">
+          <div class="result-row-head"><h4>Weight</h4></div>
+          <div class="carousel-frame">
+            <button class="carousel-arrow carousel-arrow-previous" type="button" data-scroll="weight-track" data-direction="-1" aria-label="Show previous weight experiments"></button>
+            <div class="media-track" id="weight-track">
+              <div class="media-tile strip-tile" data-video-path="real_world/carry/weight/0_55kg.mp4"><img src="assets/images/g1-suitcase.png" alt="Carry a 0.55 kilogram payload" /><button type="button">▶</button><span>0.55 kg</span></div>
+              <div class="media-tile strip-tile" data-video-path="real_world/carry/weight/1_3kg.mp4"><img src="assets/images/hero-experiment.png" alt="Carry a 1.3 kilogram payload" /><button type="button">▶</button><span>1.3 kg</span></div>
+              <div class="media-tile strip-tile" data-video-path="real_world/carry/weight/2_2kg.mp4"><img src="assets/images/carry-height.png" alt="Carry a 2.2 kilogram payload" /><button type="button">▶</button><span>2.2 kg</span></div>
+              <div class="media-tile strip-tile" data-video-path="real_world/carry/weight/3_2kg.mp4"><img src="assets/images/carry-size.png" alt="Carry a 3.2 kilogram payload" /><button type="button">▶</button><span>3.2 kg</span></div>
+            </div>
+            <button class="carousel-arrow carousel-arrow-next" type="button" data-scroll="weight-track" data-direction="1" aria-label="Show next weight experiments"></button>
+          </div>
+        </div>
+
+        <div class="result-row">
+          <div class="result-row-head"><h4>Cylinder</h4></div>
+          <div class="media-track two-items" id="carry-cylinder-track">
+            <div class="media-tile strip-tile" data-video-path="real_world/carry/cylinder/01.mp4"><img src="assets/images/carry-size.png" alt="First cylinder carry experiment" /><button type="button">▶</button><span>Cylinder 1</span></div>
+            <div class="media-tile strip-tile" data-video-path="real_world/carry/cylinder/02.mp4"><img src="assets/images/carry-height.png" alt="Second cylinder carry experiment" /><button type="button">▶</button><span>Cylinder 2</span></div>
+          </div>
+        </div>
+
+        <h3 class="task-title task-title-push">Push</h3>
+
+        <div class="result-row">
+          <div class="result-row-head"><h4>Size</h4></div>
+          <div class="media-track" id="push-size-track">
+            <div class="media-tile strip-tile" data-video-path="real_world/push/size/small.mp4"><img src="assets/images/push-size.png" alt="Push a small object" /><button type="button">▶</button><span>Small</span></div>
+            <div class="media-tile strip-tile" data-video-path="real_world/push/size/mid.mp4"><img src="assets/images/push-mass.png" alt="Push a medium object" /><button type="button">▶</button><span>Mid</span></div>
+            <div class="media-tile strip-tile" data-video-path="real_world/push/size/big.mp4"><img src="assets/images/push-size.png" alt="Push a large object" /><button type="button">▶</button><span>Big</span></div>
+          </div>
+        </div>
+
+        <div class="result-row">
+          <div class="result-row-head"><h4>OOD</h4></div>
+          <div class="media-track two-items" id="push-ood-track">
+            <div class="media-tile strip-tile" data-video-path="real_world/push/ood/25kg_load.mp4"><img src="assets/images/push-mass.png" alt="Push a 25 kilogram load" /><button type="button">▶</button><span>25 kg Load</span></div>
+            <div class="media-tile strip-tile" data-video-path="real_world/push/ood/bucket.mp4"><img src="assets/images/push-size.png" alt="Push a bucket" /><button type="button">▶</button><span>Bucket</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section results-section" id="cross-embodiment">
+      <div class="results-shell">
+        <h2 class="section-title results-title">Cross-Embodiment</h2>
+        <div class="cross-grid">
+          <div class="media-tile cross-tile" data-video-path="kuavo/experiment-01.mp4"><div class="kuavo-placeholder">KUAVO</div><button type="button">▶</button><span>Object Carrying</span></div>
+          <div class="media-tile cross-tile" data-video-path="kuavo/experiment-02.mp4"><div class="kuavo-placeholder">KUAVO</div><button type="button">▶</button><span>Object Pushing</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section citation-section" id="citation">
+      <div class="shell citation-layout">
+        <h2 class="section-title">Citation</h2>
+        <div class="citation-card"><button type="button" id="copy-citation">Copy</button><pre><code id="citation-code">@article{lore2026,
+  title  = {LORE: Learning Contact-Rich Humanoid Loco-Manipulation
+            without Paired Interaction Demonstrations},
+  author = {Daoling Qin and Rui Song and Huilin Zhang and Jiayi Wang
+            and Guoteng Zhang and Jingwen Zhang},
+  year   = {2026}
+}</code></pre></div>
+      </div>
+    </section>
+  </main>
+
+  <footer><div class="shell"><strong>LORE</strong><span>Project page · <span id="current-year"></span></span></div></footer>
+
+  <dialog id="image-dialog"><button type="button" aria-label="Close image">×</button><img src="assets/images/framework-overview.png" alt="Full-size overview of LORE" /></dialog>
+  <div class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
