@@ -293,6 +293,18 @@ dialog img { width: 100%; border-radius: 7px; }
   .results-section .matrix-block h3,
   .results-section .task-title { font-size: .9vw; }
   .result-row-head h4 { font-size: 1vw; }
+
+  .matrix-header,
+  .matrix-data-row,
+  .result-row {
+    grid-template-columns: 6vw minmax(0, 1fr);
+    gap: 1vw;
+  }
+
+  .media-tile > button,
+  .carousel-arrow { width: min(2.5vw, 42px); height: min(2.5vw, 42px); }
+  .carousel-arrow-previous { left: -1.25vw; }
+  .carousel-arrow-next { right: -1.25vw; }
 }
 
 @media (max-width: 1000px) {
