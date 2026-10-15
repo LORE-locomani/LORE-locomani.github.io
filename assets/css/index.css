@@ -167,8 +167,7 @@ button { color: inherit; font: inherit; }
 .contact-pair { display: grid; flex: 0 0 calc((100% - 24px) / 3); gap: 12px; scroll-snap-align: start; }
 .contact-pair .strip-tile { width: 100%; }
 
-.media-tile { position: relative; overflow: hidden; border: 1px solid #c9ced2; border-radius: 8px; background: #11141c; }
-.row-videos .media-tile { aspect-ratio: var(--video-ratio); }
+.media-tile { position: relative; width: 100%; aspect-ratio: var(--video-ratio); overflow: hidden; border: 1px solid #c9ced2; border-radius: 8px; background: #11141c; }
 .media-tile > button {
   position: absolute;
   z-index: 7;
@@ -234,12 +233,12 @@ button { color: inherit; font: inherit; }
 .carousel-arrow-next::before { margin-right: -2px; border-width: 6px 0 6px 8px; border-color: transparent transparent transparent #242824; }
 .media-track { display: flex; min-width: 0; gap: 12px; overflow-x: auto; scroll-behavior: smooth; scrollbar-width: none; scroll-snap-type: x proximity; }
 .media-track::-webkit-scrollbar { display: none; }
-.strip-tile { flex: 0 0 calc((100% - 24px) / 3); aspect-ratio: var(--video-ratio); scroll-snap-align: start; }
+.strip-tile { flex: 0 0 calc((100% - 24px) / 3); scroll-snap-align: start; }
+.two-items { justify-content: center; }
 .strip-tile::after { content: ""; position: absolute; z-index: 5; inset: 58% 0 0; background: linear-gradient(transparent, rgba(9,12,18,.72)); pointer-events: none; }
 .strip-tile > span { position: absolute; z-index: 6; right: 13px; bottom: 10px; left: 13px; color: white; font-size: var(--text-ui); font-weight: 800; line-height: 1.25; }
 
-.cross-grid { display: grid; max-width: 1500px; margin-inline: auto; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-.cross-tile { aspect-ratio: var(--video-ratio); }
+.cross-grid { display: grid; width: 100%; margin-inline: auto; grid-template-columns: repeat(2, minmax(0, calc((100% - 24px) / 3))); justify-content: center; gap: 12px; }
 .cross-tile::after { content: ""; position: absolute; z-index: 5; inset: 58% 0 0; background: linear-gradient(transparent, rgba(9,12,18,.72)); pointer-events: none; }
 .cross-tile > span { position: absolute; z-index: 6; right: 13px; bottom: 10px; left: 13px; color: white; font-size: var(--text-ui); font-weight: 800; }
 .strip-tile.playing::after, .cross-tile.playing::after,
@@ -317,6 +316,7 @@ dialog img { width: 100%; border-radius: 7px; }
   .matrix-header,
   .matrix-data-row { grid-template-columns: 130px minmax(0, 1fr); gap: 24px; }
   .matrix-data-row .result-row-head { flex-direction: column; align-items: flex-start; }
+  .cross-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 850px) {
