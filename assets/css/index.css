@@ -55,7 +55,7 @@ button { color: inherit; font: inherit; }
   padding-top: 150px;
   padding-bottom: 78px;
 }
-.hero-copy { width: 100%; }
+.hero-copy { width: 100%; text-align: center; }
 .hero-copy h1 {
   margin: 0;
   color: var(--blue);
@@ -195,7 +195,6 @@ button { color: inherit; font: inherit; }
 .media-tile.autoplaying > button:focus-visible { opacity: 1; }
 .media-tile > video { position: absolute; z-index: 4; inset: 0; width: 100%; height: 100%; background: #07090d; object-fit: contain; opacity: 0; pointer-events: none; transition: opacity 180ms ease; }
 .media-tile.has-video > video, .media-tile.playing > video { opacity: 1; }
-.media-tile.has-video > .kuavo-placeholder { opacity: 0; }
 .media-tile.playing > video { pointer-events: auto; }
 .media-tile.playing > button { display: none; }
 .media-empty { display: grid; place-items: center; background: #e9ecea; color: #66716e; }
@@ -245,8 +244,6 @@ button { color: inherit; font: inherit; }
 .cross-tile > span { position: absolute; z-index: 6; right: 13px; bottom: 10px; left: 13px; color: white; font-size: var(--text-ui); font-weight: 800; }
 .strip-tile.playing::after, .cross-tile.playing::after,
 .strip-tile.playing > span, .cross-tile.playing > span { display: none; }
-.kuavo-placeholder { display: grid; width: 100%; height: 100%; place-items: center; color: white; background: radial-gradient(circle at 35% 35%, #718ce2, #283968); font-size: clamp(25px, 4vw, 48px); font-weight: 850; letter-spacing: 0; }
-.cross-grid > div:nth-child(2) .kuavo-placeholder { background: radial-gradient(circle at 35% 35%, #9d89e4, #433472); }
 
 .citation-section { color: white; background: #191c23; }
 .citation-layout { display: grid; grid-template-columns: .35fr .65fr; align-items: start; gap: 55px; }
