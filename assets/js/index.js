@@ -74,9 +74,10 @@ function createTileVideo(tile) {
   video.defaultMuted = true;
   video.loop = true;
   video.playsInline = true;
-  video.preload = "auto";
+  video.preload = "metadata";
   video.setAttribute("muted", "");
   video.setAttribute("playsinline", "");
+  video.setAttribute("loading", "lazy");
   video.setAttribute("aria-hidden", "true");
 
   video.addEventListener(
@@ -101,6 +102,7 @@ function createTileVideo(tile) {
   video.addEventListener(
     "error",
     () => {
+      if (video.dataset.releasing === "true") return;
       tile.dataset.videoMissing = "true";
       tile.classList.remove("has-video", "playing", "autoplaying");
       if (video.dataset.manual === "true") {
@@ -112,7 +114,6 @@ function createTileVideo(tile) {
   );
 
   tile.append(video);
-  video.load();
   return video;
 }
 
@@ -153,6 +154,19 @@ function pauseTileVideo(tile) {
   tile.classList.remove("autoplaying");
 }
 
+function releaseTileVideo(tile) {
+  const video = tile.querySelector("video");
+  if (!video || video.dataset.manual === "true") return;
+
+  video.dataset.releasing = "true";
+  video.pause();
+  video.remove();
+  video.removeAttribute("src");
+  video.load();
+  tile.classList.remove("has-video", "playing", "autoplaying");
+  delete tile.dataset.previewAttempted;
+}
+
 function loadVideoPreview(tile) {
   if (tile.dataset.previewAttempted === "true" || tile.querySelector("video")) return;
   tile.dataset.previewAttempted = "true";
@@ -177,14 +191,21 @@ if ("IntersectionObserver" in window) {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
         loadVideoPreview(entry.target);
-        videoObserver.unobserve(entry.target);
       });
     },
-    { rootMargin: "500px 0px" },
+    { rootMargin: "150px 0px" },
   );
   videoTiles.forEach((tile) => videoObserver.observe(tile));
-} else {
-  videoTiles.forEach(loadVideoPreview);
+
+  const videoReleaseObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) releaseTileVideo(entry.target);
+      });
+    },
+    { rootMargin: "1200px 0px" },
+  );
+  videoTiles.forEach((tile) => videoReleaseObserver.observe(tile));
 }
 
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -205,8 +226,6 @@ if (!reduceMotion && "IntersectionObserver" in window) {
     { threshold: [0, 0.35, 0.7] },
   );
   videoTiles.forEach((tile) => playbackObserver.observe(tile));
-} else if (!reduceMotion) {
-  videoTiles.forEach(startAutoPlayback);
 }
 
 document.addEventListener("visibilitychange", () => {
