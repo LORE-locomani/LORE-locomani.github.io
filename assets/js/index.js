@@ -174,12 +174,7 @@ if ("IntersectionObserver" in window) {
 }
 
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-const autoplayCandidates = new Set();
 let autoplayFrame = 0;
-
-function getPlaybackGroup(tile) {
-  return tile.closest(".row-videos, .media-track, .cross-grid") || tile.parentElement;
-}
 
 function refreshAutoPlayback() {
   autoplayFrame = 0;
@@ -189,37 +184,10 @@ function refreshAutoPlayback() {
     return;
   }
 
-  const visibleTiles = [...autoplayCandidates].filter((tile) => tile.dataset.inView === "true");
-  const playbackGroups = new Map();
-
-  visibleTiles.forEach((tile) => {
-    const group = getPlaybackGroup(tile);
-    if (!group) return;
-    const groupedTiles = playbackGroups.get(group) || [];
-    groupedTiles.push(tile);
-    playbackGroups.set(group, groupedTiles);
-  });
-
-  const viewportCenter = window.innerHeight / 2;
-  const rankedGroups = [...playbackGroups.entries()].sort(([firstGroup, firstTiles], [secondGroup, secondTiles]) => {
-    const manualDifference = Number(secondTiles.some((tile) => tile.querySelector("video")?.dataset.manual === "true"))
-      - Number(firstTiles.some((tile) => tile.querySelector("video")?.dataset.manual === "true"));
-    if (manualDifference) return manualDifference;
-
-    const firstBox = firstGroup.getBoundingClientRect();
-    const secondBox = secondGroup.getBoundingClientRect();
-    const firstDistance = Math.abs(firstBox.top + firstBox.height / 2 - viewportCenter);
-    const secondDistance = Math.abs(secondBox.top + secondBox.height / 2 - viewportCenter);
-    return firstDistance - secondDistance;
-  });
-
-  const [activeGroup, groupedTiles = []] = rankedGroups[0] || [];
-  const groupLimit = activeGroup?.classList.contains("contact-pair-track") ? 6 : 3;
-  const activeTiles = groupedTiles.slice(0, groupLimit);
-  const activeSet = new Set(activeTiles);
-
   videoTiles.forEach((tile) => {
-    if (activeSet.has(tile)) {
+    const visibleRatio = Number(tile.dataset.visibleRatio) || 0;
+    const isManual = tile.querySelector("video")?.dataset.manual === "true";
+    if (visibleRatio >= 0.75 || (isManual && visibleRatio > 0)) {
       startAutoPlayback(tile);
     } else {
       pauseTileVideo(tile);
@@ -236,17 +204,11 @@ if (!reduceMotion && "IntersectionObserver" in window) {
   const playbackObserver = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
-        const shouldPlay = entry.isIntersecting && entry.intersectionRatio >= 0.15;
-        entry.target.dataset.inView = String(shouldPlay);
-        if (shouldPlay) {
-          autoplayCandidates.add(entry.target);
-        } else {
-          autoplayCandidates.delete(entry.target);
-        }
+        entry.target.dataset.visibleRatio = String(entry.isIntersecting ? entry.intersectionRatio : 0);
       });
       scheduleAutoPlaybackRefresh();
     },
-    { threshold: [0, 0.15, 0.5] },
+    { threshold: [0, 0.25, 0.5, 0.75, 1] },
   );
   videoTiles.forEach((tile) => playbackObserver.observe(tile));
 }
