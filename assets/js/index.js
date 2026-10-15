@@ -55,32 +55,21 @@ const videoTiles = document.querySelectorAll(".media-tile[data-video-path]");
 
 function createTileVideo(tile) {
   const relativePath = tile.dataset.videoPath;
+  const cleanPath = relativePath.split("?")[0];
   const assetVersion = relativePath.startsWith("real_world/") ? "?v=h264-1080p-1" : "";
   const video = document.createElement("video");
   video.className = "video-preview";
-  video.src = "assets/videos/" + relativePath + assetVersion;
+  video.dataset.source = "assets/videos/" + relativePath + assetVersion;
+  video.poster = "assets/posters/" + cleanPath.replace(/\.mp4$/i, ".webp");
   video.muted = true;
   video.defaultMuted = true;
   video.loop = true;
   video.playsInline = true;
-  video.preload = "metadata";
+  video.preload = "none";
   video.setAttribute("muted", "");
   video.setAttribute("playsinline", "");
   video.setAttribute("loading", "lazy");
   video.setAttribute("aria-hidden", "true");
-
-  video.addEventListener(
-    "loadedmetadata",
-    () => {
-      if (video.dataset.active === "true" || !Number.isFinite(video.duration) || video.duration <= 0.1) return;
-      try {
-        video.currentTime = Math.min(0.08, video.duration / 2);
-      } catch {
-        // The browser will keep the first decodable frame.
-      }
-    },
-    { once: true },
-  );
 
   video.addEventListener(
     "loadeddata",
@@ -91,9 +80,8 @@ function createTileVideo(tile) {
   video.addEventListener(
     "error",
     () => {
-      if (video.dataset.releasing === "true") return;
       tile.dataset.videoMissing = "true";
-      tile.classList.remove("has-video", "playing", "autoplaying");
+      tile.classList.remove("has-poster", "has-video", "playing", "autoplaying");
       if (video.dataset.manual === "true") {
         showToast("Add video: assets/videos/" + relativePath);
       }
@@ -103,10 +91,19 @@ function createTileVideo(tile) {
   );
 
   tile.append(video);
+  tile.classList.add("has-poster");
   return video;
 }
 
+function ensureTileVideoSource(video, preload = "auto") {
+  video.preload = preload;
+  if (video.dataset.sourceReady === "true") return;
+  video.src = video.dataset.source;
+  video.dataset.sourceReady = "true";
+}
+
 function activateTileVideo(tile, video) {
+  ensureTileVideoSource(video);
   video.dataset.active = "true";
   video.dataset.manual = "true";
   video.classList.remove("video-preview");
@@ -123,6 +120,7 @@ function activateTileVideo(tile, video) {
 function startAutoPlayback(tile) {
   if (tile.dataset.videoMissing === "true") return;
   const video = tile.querySelector("video") || createTileVideo(tile);
+  ensureTileVideoSource(video);
   video.classList.remove("video-preview");
   video.removeAttribute("aria-hidden");
   video.muted = true;
@@ -141,19 +139,6 @@ function startAutoPlayback(tile) {
 function pauseTileVideo(tile) {
   tile.querySelector("video")?.pause();
   tile.classList.remove("autoplaying");
-}
-
-function releaseTileVideo(tile) {
-  const video = tile.querySelector("video");
-  if (!video || video.dataset.manual === "true") return;
-
-  video.dataset.releasing = "true";
-  video.pause();
-  video.remove();
-  video.removeAttribute("src");
-  video.load();
-  tile.classList.remove("has-video", "playing", "autoplaying");
-  delete tile.dataset.previewAttempted;
 }
 
 function loadVideoPreview(tile) {
@@ -182,22 +167,54 @@ if ("IntersectionObserver" in window) {
         loadVideoPreview(entry.target);
       });
     },
-    { rootMargin: "600px 0px" },
+    { rootMargin: "100px 0px" },
   );
   videoTiles.forEach((tile) => videoObserver.observe(tile));
-
-  const videoReleaseObserver = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) releaseTileVideo(entry.target);
-      });
-    },
-    { rootMargin: "1200px 0px" },
-  );
-  videoTiles.forEach((tile) => videoReleaseObserver.observe(tile));
 }
 
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const maxAutoplayVideos = 3;
+const autoplayCandidates = new Set();
+let autoplayFrame = 0;
+
+function refreshAutoPlayback() {
+  autoplayFrame = 0;
+
+  if (reduceMotion || document.hidden) {
+    videoTiles.forEach(pauseTileVideo);
+    return;
+  }
+
+  const viewportCenter = window.innerHeight / 2;
+  const activeTiles = [...autoplayCandidates]
+    .filter((tile) => tile.dataset.inView === "true")
+    .sort((first, second) => {
+      const manualDifference = Number(second.querySelector("video")?.dataset.manual === "true")
+        - Number(first.querySelector("video")?.dataset.manual === "true");
+      if (manualDifference) return manualDifference;
+
+      const firstBox = first.getBoundingClientRect();
+      const secondBox = second.getBoundingClientRect();
+      const firstDistance = Math.abs(firstBox.top + firstBox.height / 2 - viewportCenter);
+      const secondDistance = Math.abs(secondBox.top + secondBox.height / 2 - viewportCenter);
+      return firstDistance - secondDistance;
+    })
+    .slice(0, maxAutoplayVideos);
+  const activeSet = new Set(activeTiles);
+
+  videoTiles.forEach((tile) => {
+    if (activeSet.has(tile)) {
+      startAutoPlayback(tile);
+    } else {
+      pauseTileVideo(tile);
+    }
+  });
+}
+
+function scheduleAutoPlaybackRefresh() {
+  if (autoplayFrame) return;
+  autoplayFrame = window.requestAnimationFrame(refreshAutoPlayback);
+}
 
 if (!reduceMotion && "IntersectionObserver" in window) {
   const playbackObserver = new IntersectionObserver(
@@ -205,12 +222,13 @@ if (!reduceMotion && "IntersectionObserver" in window) {
       entries.forEach((entry) => {
         const shouldPlay = entry.isIntersecting && entry.intersectionRatio >= 0.15;
         entry.target.dataset.inView = String(shouldPlay);
-        if (shouldPlay && !document.hidden) {
-          startAutoPlayback(entry.target);
+        if (shouldPlay) {
+          autoplayCandidates.add(entry.target);
         } else {
-          pauseTileVideo(entry.target);
+          autoplayCandidates.delete(entry.target);
         }
       });
+      scheduleAutoPlaybackRefresh();
     },
     { threshold: [0, 0.15, 0.5] },
   );
@@ -218,14 +236,10 @@ if (!reduceMotion && "IntersectionObserver" in window) {
 }
 
 document.addEventListener("visibilitychange", () => {
-  videoTiles.forEach((tile) => {
-    if (document.hidden) {
-      pauseTileVideo(tile);
-    } else if (!reduceMotion && tile.dataset.inView === "true") {
-      startAutoPlayback(tile);
-    }
-  });
+  scheduleAutoPlaybackRefresh();
 });
+window.addEventListener("scroll", scheduleAutoPlaybackRefresh, { passive: true });
+window.addEventListener("resize", scheduleAutoPlaybackRefresh, { passive: true });
 
 const scrollButtons = [...document.querySelectorAll("[data-scroll]")];
 const scrollTracks = new Set();
