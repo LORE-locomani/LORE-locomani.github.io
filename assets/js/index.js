@@ -74,7 +74,7 @@ function createTileVideo(tile) {
   video.defaultMuted = true;
   video.loop = true;
   video.playsInline = true;
-  video.preload = "metadata";
+  video.preload = "auto";
   video.setAttribute("muted", "");
   video.setAttribute("playsinline", "");
   video.setAttribute("aria-hidden", "true");

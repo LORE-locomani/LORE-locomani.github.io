@@ -121,7 +121,7 @@ button { color: inherit; font: inherit; }
 .abstract p:last-child { margin-bottom: 0; }
 
 .overview-figure { position: relative; max-width: 1600px; margin: 0 auto; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: white; }
-.overview-figure img { width: 100%; }
+.overview-figure img { width: 100%; height: auto; }
 .zoom-button { position: absolute; right: 13px; bottom: 13px; padding: 8px 12px; border: 1px solid rgba(255,255,255,.7); border-radius: 8px; color: white; background: rgba(17,21,29,.76); cursor: pointer; font-size: var(--text-small); font-weight: 750; backdrop-filter: blur(8px); }
 
 .matrix-block + .matrix-block { margin-top: 58px; }
@@ -157,8 +157,6 @@ button { color: inherit; font: inherit; }
 
 .media-tile { position: relative; overflow: hidden; border: 1px solid #c9ced2; border-radius: 8px; background: #11141c; }
 .row-videos .media-tile { aspect-ratio: var(--video-ratio); }
-.media-tile > img { width: 100%; height: 100%; object-fit: cover; transition: transform 260ms ease, opacity 180ms ease; }
-.media-tile:hover > img { transform: scale(1.02); }
 .media-tile > button {
   position: absolute;
   z-index: 7;
@@ -183,9 +181,9 @@ button { color: inherit; font: inherit; }
 .media-tile.autoplaying > button:focus-visible { opacity: 1; }
 .media-tile > video { position: absolute; z-index: 4; inset: 0; width: 100%; height: 100%; background: #07090d; object-fit: contain; opacity: 0; pointer-events: none; transition: opacity 180ms ease; }
 .media-tile.has-video > video, .media-tile.playing > video { opacity: 1; }
-.media-tile.has-video > img, .media-tile.has-video > .kuavo-placeholder { opacity: 0; }
+.media-tile.has-video > .kuavo-placeholder { opacity: 0; }
 .media-tile.playing > video { pointer-events: auto; }
-.media-tile.playing > button, .media-tile.playing > img { display: none; }
+.media-tile.playing > button { display: none; }
 .media-empty { display: grid; place-items: center; background: #e9ecea; color: #66716e; }
 .media-empty::after { content: "Not reported"; font-size: var(--text-ui); font-weight: 700; }
 
