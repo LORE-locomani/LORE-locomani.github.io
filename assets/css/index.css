@@ -34,9 +34,6 @@ button { color: inherit; font: inherit; }
 .shell { width: var(--shell); margin-inline: auto; }
 .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); }
 
-.reading-progress { position: fixed; z-index: 100; inset: 0 0 auto; height: 3px; pointer-events: none; }
-.reading-progress span { display: block; width: 0; height: 100%; background: var(--blue); }
-
 .site-header {
   position: absolute;
   z-index: 20;

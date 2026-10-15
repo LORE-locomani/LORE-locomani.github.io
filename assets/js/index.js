@@ -1,6 +1,5 @@
 const navToggle = document.querySelector(".nav-toggle");
 const navLinks = document.querySelector(".nav-links");
-const progressBar = document.querySelector(".reading-progress span");
 const toast = document.querySelector(".toast");
 let toastTimer;
 
@@ -23,16 +22,6 @@ navLinks?.querySelectorAll("a").forEach((link) => {
     navToggle?.setAttribute("aria-expanded", "false");
   });
 });
-
-function updateProgress() {
-  if (!progressBar) return;
-  const scrollable = document.documentElement.scrollHeight - window.innerHeight;
-  const progress = scrollable > 0 ? (window.scrollY / scrollable) * 100 : 0;
-  progressBar.style.width = `${Math.min(progress, 100)}%`;
-}
-
-window.addEventListener("scroll", updateProgress, { passive: true });
-updateProgress();
 
 document.querySelectorAll("[data-placeholder-link]").forEach((link) => {
   link.addEventListener("click", (event) => {
@@ -193,7 +182,7 @@ if ("IntersectionObserver" in window) {
         loadVideoPreview(entry.target);
       });
     },
-    { rootMargin: "150px 0px" },
+    { rootMargin: "600px 0px" },
   );
   videoTiles.forEach((tile) => videoObserver.observe(tile));
 
@@ -214,7 +203,7 @@ if (!reduceMotion && "IntersectionObserver" in window) {
   const playbackObserver = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
-        const shouldPlay = entry.isIntersecting && entry.intersectionRatio >= 0.35;
+        const shouldPlay = entry.isIntersecting && entry.intersectionRatio >= 0.15;
         entry.target.dataset.inView = String(shouldPlay);
         if (shouldPlay && !document.hidden) {
           startAutoPlayback(entry.target);
@@ -223,7 +212,7 @@ if (!reduceMotion && "IntersectionObserver" in window) {
         }
       });
     },
-    { threshold: [0, 0.35, 0.7] },
+    { threshold: [0, 0.15, 0.5] },
   );
   videoTiles.forEach((tile) => playbackObserver.observe(tile));
 }
