@@ -156,6 +156,7 @@ videoTiles.forEach((tile) => {
     }
     const video = tile.querySelector("video") || createTileVideo(tile);
     activateTileVideo(tile, video);
+    scheduleAutoPlaybackRefresh();
   });
 });
 
@@ -173,9 +174,12 @@ if ("IntersectionObserver" in window) {
 }
 
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-const maxAutoplayVideos = 3;
 const autoplayCandidates = new Set();
 let autoplayFrame = 0;
+
+function getPlaybackGroup(tile) {
+  return tile.closest(".row-videos, .media-track, .cross-grid") || tile.parentElement;
+}
 
 function refreshAutoPlayback() {
   autoplayFrame = 0;
@@ -185,21 +189,33 @@ function refreshAutoPlayback() {
     return;
   }
 
-  const viewportCenter = window.innerHeight / 2;
-  const activeTiles = [...autoplayCandidates]
-    .filter((tile) => tile.dataset.inView === "true")
-    .sort((first, second) => {
-      const manualDifference = Number(second.querySelector("video")?.dataset.manual === "true")
-        - Number(first.querySelector("video")?.dataset.manual === "true");
-      if (manualDifference) return manualDifference;
+  const visibleTiles = [...autoplayCandidates].filter((tile) => tile.dataset.inView === "true");
+  const playbackGroups = new Map();
 
-      const firstBox = first.getBoundingClientRect();
-      const secondBox = second.getBoundingClientRect();
-      const firstDistance = Math.abs(firstBox.top + firstBox.height / 2 - viewportCenter);
-      const secondDistance = Math.abs(secondBox.top + secondBox.height / 2 - viewportCenter);
-      return firstDistance - secondDistance;
-    })
-    .slice(0, maxAutoplayVideos);
+  visibleTiles.forEach((tile) => {
+    const group = getPlaybackGroup(tile);
+    if (!group) return;
+    const groupedTiles = playbackGroups.get(group) || [];
+    groupedTiles.push(tile);
+    playbackGroups.set(group, groupedTiles);
+  });
+
+  const viewportCenter = window.innerHeight / 2;
+  const rankedGroups = [...playbackGroups.entries()].sort(([firstGroup, firstTiles], [secondGroup, secondTiles]) => {
+    const manualDifference = Number(secondTiles.some((tile) => tile.querySelector("video")?.dataset.manual === "true"))
+      - Number(firstTiles.some((tile) => tile.querySelector("video")?.dataset.manual === "true"));
+    if (manualDifference) return manualDifference;
+
+    const firstBox = firstGroup.getBoundingClientRect();
+    const secondBox = secondGroup.getBoundingClientRect();
+    const firstDistance = Math.abs(firstBox.top + firstBox.height / 2 - viewportCenter);
+    const secondDistance = Math.abs(secondBox.top + secondBox.height / 2 - viewportCenter);
+    return firstDistance - secondDistance;
+  });
+
+  const [activeGroup, groupedTiles = []] = rankedGroups[0] || [];
+  const groupLimit = activeGroup?.classList.contains("contact-pair-track") ? 6 : 3;
+  const activeTiles = groupedTiles.slice(0, groupLimit);
   const activeSet = new Set(activeTiles);
 
   videoTiles.forEach((tile) => {
@@ -258,7 +274,10 @@ scrollButtons.forEach((button) => {
   const track = document.getElementById(button.dataset.scroll);
   if (track && !scrollTracks.has(track)) {
     scrollTracks.add(track);
-    track.addEventListener("scroll", () => updateScrollButtons(track), { passive: true });
+    track.addEventListener("scroll", () => {
+      updateScrollButtons(track);
+      scheduleAutoPlaybackRefresh();
+    }, { passive: true });
   }
 
   button.addEventListener("click", () => {
