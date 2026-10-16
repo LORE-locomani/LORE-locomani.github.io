@@ -52,6 +52,36 @@ function renderMainVideo() {
 renderMainVideo();
 
 const videoTiles = document.querySelectorAll(".media-tile[data-video-path]");
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const nearbyTiles = new Set();
+const warmedTiles = new WeakSet();
+const videoWarmups = new Map();
+const pendingPlays = new WeakMap();
+const maxBackgroundWarmups = 2;
+let autoplayFrame = 0;
+
+function finishVideoWarmup(tile, warmed = false) {
+  const warmup = videoWarmups.get(tile);
+  if (!warmup) return;
+  warmup.cleanup();
+  videoWarmups.delete(tile);
+  if (warmed) warmedTiles.add(tile);
+  if ((Number(tile.dataset.visibleRatio) || 0) < 0.75 && warmup.video.dataset.manual !== "true") {
+    warmup.video.preload = "metadata";
+  }
+  scheduleAutoPlaybackRefresh();
+}
+
+function requestVideoPlayback(video) {
+  if (!video.paused || pendingPlays.has(video)) return;
+  const attempt = video.play();
+  if (!attempt?.then) return;
+  pendingPlays.set(video, attempt);
+  const done = () => {
+    if (pendingPlays.get(video) === attempt) pendingPlays.delete(video);
+  };
+  attempt.then(done, done);
+}
 
 function createTileVideo(tile) {
   const relativePath = tile.dataset.videoPath;
@@ -68,8 +98,8 @@ function createTileVideo(tile) {
   video.preload = "none";
   video.setAttribute("muted", "");
   video.setAttribute("playsinline", "");
-  video.setAttribute("loading", "lazy");
   video.setAttribute("aria-hidden", "true");
+  video.addEventListener("canplay", scheduleAutoPlaybackRefresh);
 
   video.addEventListener(
     "loadeddata",
@@ -103,6 +133,7 @@ function ensureTileVideoSource(video, preload = "auto") {
 }
 
 function activateTileVideo(tile, video) {
+  finishVideoWarmup(tile, video.readyState >= 2);
   ensureTileVideoSource(video);
   video.dataset.active = "true";
   video.dataset.manual = "true";
@@ -114,12 +145,13 @@ function activateTileVideo(tile, video) {
   video.preload = "auto";
   tile.classList.remove("autoplaying");
   tile.classList.add("has-video", "playing");
-  video.play().catch(() => {});
+  requestVideoPlayback(video);
 }
 
 function startAutoPlayback(tile) {
   if (tile.dataset.videoMissing === "true") return;
   const video = tile.querySelector("video") || createTileVideo(tile);
+  finishVideoWarmup(tile, video.readyState >= 2);
   ensureTileVideoSource(video);
   video.classList.remove("video-preview");
   video.removeAttribute("aria-hidden");
@@ -133,12 +165,76 @@ function startAutoPlayback(tile) {
     video.controls = false;
     tile.classList.add("autoplaying");
   }
-  video.play().catch(() => {});
+  requestVideoPlayback(video);
 }
 
 function pauseTileVideo(tile) {
-  tile.querySelector("video")?.pause();
+  const video = tile.querySelector("video");
+  if (video) {
+    // Prevent a late canplay event from restarting an offscreen video.
+    video.autoplay = false;
+    if (!video.paused || pendingPlays.has(video)) video.pause();
+    if (!videoWarmups.has(tile) && video.dataset.sourceReady === "true") {
+      video.preload = "metadata";
+    }
+  }
   tile.classList.remove("autoplaying");
+}
+
+function warmNearbyVideos() {
+  for (const [tile, warmup] of videoWarmups) {
+    if (document.hidden || !nearbyTiles.has(tile)) {
+      finishVideoWarmup(tile, warmup.video.readyState >= 2);
+    }
+  }
+  if (document.hidden || reduceMotion) return;
+
+  // Visible videos always start immediately. Warmup slots only govern videos
+  // that have not reached the playback threshold yet.
+  const visibleVideoIsWaiting = [...videoTiles].some((tile) => {
+    if ((Number(tile.dataset.visibleRatio) || 0) < 0.75 || tile.dataset.videoMissing === "true") return false;
+    return (tile.querySelector("video")?.readyState ?? 0) < 3;
+  });
+  if (visibleVideoIsWaiting) return;
+
+  const candidates = [...nearbyTiles]
+    .filter((tile) => (Number(tile.dataset.visibleRatio) || 0) < 0.75 && !warmedTiles.has(tile)
+      && !videoWarmups.has(tile) && tile.dataset.videoMissing !== "true")
+    .sort((a, b) => {
+      const distance = (tile) => {
+        const box = tile.getBoundingClientRect();
+        return Math.max(0, box.top - window.innerHeight, -box.bottom);
+      };
+      return distance(a) - distance(b);
+    });
+
+  for (const tile of candidates) {
+    if (videoWarmups.size >= maxBackgroundWarmups) break;
+    const video = tile.querySelector("video") || createTileVideo(tile);
+    if (video.readyState >= 2) {
+      warmedTiles.add(tile);
+      continue;
+    }
+    const complete = () => finishVideoWarmup(tile, true);
+    const failed = () => finishVideoWarmup(tile);
+    // A stalled request must not hold a background slot indefinitely. Retrying
+    // remains available when the video becomes visible.
+    const timeout = window.setTimeout(() => {
+      warmedTiles.add(tile);
+      finishVideoWarmup(tile);
+    }, 8000);
+    videoWarmups.set(tile, {
+      video,
+      cleanup() {
+        window.clearTimeout(timeout);
+        video.removeEventListener("loadeddata", complete);
+        video.removeEventListener("error", failed);
+      },
+    });
+    video.addEventListener("loadeddata", complete, { once: true });
+    video.addEventListener("error", failed, { once: true });
+    ensureTileVideoSource(video);
+  }
 }
 
 function loadVideoPreview(tile) {
@@ -164,23 +260,26 @@ if ("IntersectionObserver" in window) {
   const videoObserver = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        loadVideoPreview(entry.target);
+        if (entry.isIntersecting) {
+          nearbyTiles.add(entry.target);
+          loadVideoPreview(entry.target);
+        } else {
+          nearbyTiles.delete(entry.target);
+        }
       });
+      scheduleAutoPlaybackRefresh();
     },
-    { rootMargin: "100px 0px" },
+    { rootMargin: "360px 0px" },
   );
   videoTiles.forEach((tile) => videoObserver.observe(tile));
 }
-
-const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-let autoplayFrame = 0;
 
 function refreshAutoPlayback() {
   autoplayFrame = 0;
 
   if (reduceMotion || document.hidden) {
     videoTiles.forEach(pauseTileVideo);
+    warmNearbyVideos();
     return;
   }
 
@@ -193,6 +292,7 @@ function refreshAutoPlayback() {
       pauseTileVideo(tile);
     }
   });
+  warmNearbyVideos();
 }
 
 function scheduleAutoPlaybackRefresh() {
@@ -216,7 +316,6 @@ if (!reduceMotion && "IntersectionObserver" in window) {
 document.addEventListener("visibilitychange", () => {
   scheduleAutoPlaybackRefresh();
 });
-window.addEventListener("scroll", scheduleAutoPlaybackRefresh, { passive: true });
 window.addEventListener("resize", scheduleAutoPlaybackRefresh, { passive: true });
 
 const scrollButtons = [...document.querySelectorAll("[data-scroll]")];
@@ -238,7 +337,6 @@ scrollButtons.forEach((button) => {
     scrollTracks.add(track);
     track.addEventListener("scroll", () => {
       updateScrollButtons(track);
-      scheduleAutoPlaybackRefresh();
     }, { passive: true });
   }
 

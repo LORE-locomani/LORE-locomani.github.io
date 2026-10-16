@@ -24,7 +24,7 @@ Use only the YouTube ID, not the complete URL.
 
 ## Experiment video paths
 
-Place browser-compatible H.264 MP4 files at the following paths. Matching WebP posters live under `assets/posters/` with the same directory and filename. Posters load near the viewport; videos play automatically when at least 75% visible, and pause out of view. Click a video to show playback controls.
+Place browser-compatible H.264 MP4 files at the following paths. Matching WebP posters live under `assets/posters/` with the same directory and filename. Posters load within 360px of the viewport. Up to two nearby videos warm their first frame in the background; visible videos waiting for data take priority over starting another warmup. Every video at least 75% visible plays automatically, with no limit on the number playing. Videos pause out of view; warmed/paused videos use `preload="metadata"` as a browser hint to reduce speculative downloading without discarding their buffers. Actual network buffering remains browser-controlled. Playback updates follow visibility changes instead of repeating `play()` on every scroll event. Click a video to show playback controls.
 
 ```text
 assets/videos/comparisons/reference/
