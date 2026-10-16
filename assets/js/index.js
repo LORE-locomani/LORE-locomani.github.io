@@ -245,7 +245,12 @@ scrollButtons.forEach((button) => {
   button.addEventListener("click", () => {
     if (!track) return;
     const direction = Number(button.dataset.direction) || 1;
-    track.scrollBy({ left: direction * track.clientWidth * 0.82, behavior: "smooth" });
+    const item = track.firstElementChild;
+    if (!item) return;
+    const gap = parseFloat(getComputedStyle(track).columnGap) || 0;
+    const step = item.getBoundingClientRect().width + gap;
+    const index = Math.round(track.scrollLeft / step) + direction;
+    track.scrollTo({ left: index * step, behavior: "smooth" });
   });
 });
 

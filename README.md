@@ -24,7 +24,7 @@ Use only the YouTube ID, not the complete URL.
 
 ## Experiment video paths
 
-Place browser-compatible H.264 MP4 files at the following paths. Existing videos are detected lazily and their first frame replaces the image placeholder automatically; click the cover to play. Missing videos keep the original image placeholder.
+Place browser-compatible H.264 MP4 files at the following paths. Matching WebP posters live under `assets/posters/` with the same directory and filename. Posters load near the viewport; videos play automatically when at least 75% visible, and pause out of view. Click a video to show playback controls.
 
 ```text
 assets/videos/comparisons/reference/
@@ -67,6 +67,20 @@ assets/videos/kuavo/
 ```
 
 The ResMimic push-box cell is intentionally empty because no corresponding video is available.
+
+## Responsive layout
+
+`assets/css/index.css` defines the shared layout values at `:root`:
+
+- `--content-width`: the centered page width (85vw, capped at 2200px).
+- `--section-space`: each section's outer vertical padding. Do not add another pair of section paddings to `.results-shell` or in a laptop breakpoint.
+- `--heading-space` and `--row-space`: spacing within sections.
+- `--row-label-width`, `--row-gap`, `--media-gap`, and `--tile-width`: the common experiment grid, including Kuavo.
+- `--video-ratio`: 16:9 for every video tile. Source videos use `object-fit: contain` to preserve their original proportions.
+
+Font sizes and spacing scale continuously with the viewport. Breakpoints only change layout: Video/Abstract and row labels stack below 1000px, navigation collapses below 850px, and experiment strips become swipeable below 700px. Two-video strips stay left-aligned on mobile so both videos remain reachable. Desktop carousel buttons advance one complete video column; Contact Analysis moves its upper and lower videos together.
+
+When changing layout, check 390, 768, 1000, 1024, 1280, 1366, 1440, 1536, 1919, 1920, and 2560px widths. Check section boundaries, 16:9 tile dimensions, the first and last carousel items, and 125%/150% display scaling. Increment the CSS/JS query versions in `index.html` when publishing edits.
 
 ## Before publication
 
