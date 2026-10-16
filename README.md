@@ -78,7 +78,7 @@ The ResMimic push-box cell is intentionally empty because no corresponding video
 - `--row-label-width`, `--row-gap`, `--media-gap`, and `--tile-width`: the common experiment grid, including Kuavo.
 - `--video-ratio`: 16:9 for every video tile. Source videos use `object-fit: contain` to preserve their original proportions.
 
-Font sizes and spacing scale continuously with the viewport. Breakpoints only change layout: Video/Abstract and row labels stack below 1000px, navigation collapses below 850px, and experiment strips become swipeable below 700px. Two-video strips stay left-aligned on mobile so both videos remain reachable. Desktop carousel buttons advance one complete video column; Contact Analysis moves its upper and lower videos together.
+Font sizes and spacing scale continuously with the viewport. Breakpoints only change layout: Video/Abstract and row labels stack below 1000px, navigation collapses below 850px, and experiment strips become swipeable below 700px. Real-world two-video strips stay left-aligned at every screen width. Desktop carousel buttons advance one complete video column; Contact Analysis moves its upper and lower videos together. Task headings consistently use "Object Carrying" and "Object Pushing".
 
 When changing layout, check 390, 768, 1000, 1024, 1280, 1366, 1440, 1536, 1919, 1920, and 2560px widths. Check section boundaries, 16:9 tile dimensions, the first and last carousel items, and 125%/150% display scaling. Increment the CSS/JS query versions in `index.html` when publishing edits.
 
