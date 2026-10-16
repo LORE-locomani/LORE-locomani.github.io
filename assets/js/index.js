@@ -86,11 +86,13 @@ function requestVideoPlayback(video) {
 function createTileVideo(tile) {
   const relativePath = tile.dataset.videoPath;
   const cleanPath = relativePath.split("?")[0];
+  const posterVersion = new URLSearchParams(relativePath.split("?")[1] || "").get("v");
   const assetVersion = relativePath.startsWith("real_world/") ? "?v=h264-1080p-1" : "";
   const video = document.createElement("video");
   video.className = "video-preview";
   video.dataset.source = "assets/videos/" + relativePath + assetVersion;
-  video.poster = "assets/posters/" + cleanPath.replace(/\.mp4$/i, ".webp");
+  video.poster = "assets/posters/" + cleanPath.replace(/\.mp4$/i, ".webp")
+    + (posterVersion ? "?v=" + encodeURIComponent(posterVersion) : "");
   video.muted = true;
   video.defaultMuted = true;
   video.loop = true;
